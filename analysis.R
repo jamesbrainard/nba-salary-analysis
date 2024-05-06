@@ -36,51 +36,26 @@ team_colors <- c(
   "WAS" = "#002B5C"
 )
 
-# Create the ggplot object with a line of best fit
-p <- ggplot(stats, aes(x = Salary, y = VORP, color = Team, label = Player)) +
-  geom_point() +  # Add scatter plot points
-  geom_smooth(method = "lm", se = FALSE, linetype = "dashed", size = 0.1, alpha = 0.05) +
-  labs(title = "NBA Player Salary vs. VORP", x = "Salary", y = "VORP") +
+# Creates the ggplot object with a line of best fit
+p <- ggplot(stats, aes(x = Salary, y = VORP, color = Team, label = Player, text = paste("Team:", Team))) +
+  geom_point(aes(text = paste("Player:", Player, "<br>Team:", Team, "<br>VORP:", VORP, "<br>Salary:", scales::dollar(Salary)))) +
+  geom_smooth(aes(text = paste("Team:", Team)), method = "lm", se = FALSE, linetype = "dashed", size = 0.1, alpha = 0.05) +
+  labs(title = "NBA Player Salary vs. 2023-2024 VORP", x = "Salary", y = "VORP") +
   scale_color_manual(values = team_colors) +
+  scale_y_continuous(limits = c(0, 12), breaks = seq(0, 12, by = 2)) +
+  scale_x_continuous(labels = scales::dollar) +  
   theme_minimal() +
-  theme(legend.position = "bottom") +
+  theme(
+    legend.position = "bottom",
+    plot.title = element_text(size = 20, face = "bold")
+  ) +
   guides(color = guide_legend(override.aes = list(size = 3)))
 
-# Convert ggplot object to plotly
-p <- ggplotly(p, tooltip = c("Player", "Team"))
+# Converts ggplot object to plotly with separate tooltips for lines and points
+p <- ggplotly(p, tooltip = "text")
 
-# Sets up the regression lines
-num_teams <- length(unique(stats$Team))
-visible_state <- c(rep(TRUE, num_teams * 2))
-for (i in seq_len(num_teams)) {
-  visible_state[num_teams + i] <- FALSE
-}
 
-# Adds a button to toggle the visibility of the regression lines
-p <- layout(p, updatemenus = list(
-  list(
-    type = "buttons",
-    direction = "left",
-    x = 0.1,
-    xanchor = "left",
-    y = 1.1,
-    yanchor = "top",
-    buttons = list(
-      list(
-        args = list("visible", visible_state),
-        label = "Hide Fit Lines",
-        method = "restyle"
-      ),
-      list(
-        args = list("visible", rep(TRUE, num_teams * 2)), 
-        label = "Show Fit Lines",
-        method = "restyle"
-      )
-    )
-  )
-))
-
-# Custom JavaScript for hover event
+# Sets up hover interaction
 p <- htmlwidgets::onRender(
   p,
   "
@@ -91,8 +66,8 @@ p <- htmlwidgets::onRender(
       var update = {
         'marker.opacity': Array(x.data.length).fill(0.1)
       };
-      for(var i = 0; i < x.data.length; i++) {
-        if(x.data[i].name === hoveredTeam) {
+      for (var i = 0; i < x.data.length; i++) {
+        if (x.data[i].name === hoveredTeam) {
           update['marker.opacity'][i] = 1; 
         }
       }
@@ -108,3 +83,4 @@ p <- htmlwidgets::onRender(
 p
 
 saveWidget(p, "index.html", selfcontained = TRUE)
+
