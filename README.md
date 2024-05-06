@@ -10,7 +10,7 @@ This project visualizes the relationship between NBA player salaries and their V
 
 ## Visualization Preview
 
-![Visualization Preview](jamesbrainard.github.io/nba-salary-analysis)
+![Visualization Preview](preview.png)
 
 > *A sample preview of the NBA Salary vs. VORP scatter plot.*
 
