@@ -40,7 +40,7 @@ team_colors <- c(
 p <- ggplot(stats, aes(x = Salary, y = VORP, color = Team, label = Player, text = paste("Team:", Team))) +
   geom_point(aes(text = paste("Player:", Player, "<br>Team:", Team, "<br>VORP:", VORP, "<br>Salary:", scales::dollar(Salary)))) +
   geom_smooth(aes(text = paste("Team:", Team)), method = "lm", se = FALSE, linetype = "dashed", size = 0.1, alpha = 0.05) +
-  labs(title = "NBA Player Salary vs. 2023-2024 VORP", x = "Salary", y = "VORP") +
+  labs(title = "NBA Player Salary vs. VORP (2023-2024)", x = "Salary", y = "VORP") +
   scale_color_manual(values = team_colors) +
   scale_y_continuous(limits = c(0, 12), breaks = seq(0, 12, by = 2)) +
   scale_x_continuous(labels = scales::dollar) +  
